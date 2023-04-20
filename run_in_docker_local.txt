@@ -1,0 +1,20 @@
+######### pre-commit
+
+mydir=$(pwd)
+tmpdir=$(mktemp -d)
+cd $tmpdir
+cp -pr $mydir ./
+rm $(find -iname "*.py?")
+docker run --mount type=bind,source=$(pwd),destination=/app --rm -it --device /dev/fuse --cap-add SYS_ADMIN --security-opt apparmor:unconfined ubuntu:latest
+
+alias l='ls -lah'
+cd /app/*/
+apt-get update
+
+DEBIAN_FRONTEND=noninteractive apt-get install -q -y gcc git pre-commit
+git config --global --add safe.directory $(pwd)
+
+pre-commit --version
+pre-commit run --all-files
+
+#########
